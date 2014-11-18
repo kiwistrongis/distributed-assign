@@ -3,7 +3,7 @@ default: build
 freshen: clean build
 clean:
 	rm -rf bin/* pkg/*
-	rm *.pdf
+	rm -f *.pdf
 
 # vars
 ## java vars
@@ -18,7 +18,7 @@ package_file = pkg/kalev_100425828_assign3.zip
 pandoc_cmd = ~/.cabal/bin/pandoc
 
 # includes
-#include deps.mk
+include deps.mk
 include lists.mk
 
 # compilation definitions
@@ -45,9 +45,12 @@ report: report.pdf
 package: $(package_file)
 
 run: \
-	test-q1-bad
-	test-q1-good
+	test-q1-bad \
+	test-q1-good \
 	test-q2
+run-bad: test-q1-bad
+run-good: test-q1-good
+
 test: test-q1-bad
 
 # tests
