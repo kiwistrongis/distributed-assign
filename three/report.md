@@ -8,14 +8,30 @@ Permalink: [link](https://github.com/kiwistrongis/distributed-assign/blob/master
 One can run the version with bad syncronization with either `make run-bad` or `java -cp bin BadCounting`, and the version with good syncronization with either `make run-good` or `java -cp bin GoodCounting`.
 
 ## Question Two
+Assumptions:  
+ - CPU time is evenly distributed across threads. For example, if two threads on the same core both begin executing a 1 ms section at the same time, they will both finish simultaneously 2 ms later.
+ - Disk I/O is blocking.
+ - I'm not intended to do the discrete math to exactly determine the answers.
+
+States ( of the two-threaded cases ):  
+ - State 0,0 - both threads are ready to serve a request
+ - State 0,1 - one thread is ready, the other is about to do a disk lookup
+ - State 0,2 - one thread is ready, the other is 5 ms into a disk lookup
+ - State 0,3 - one thread is ready, the other is 10 ms into a disk lookup
+ - State 1,1 - both threads are about to do a disk lookup
+ - State 1,2 - one thread is 5 ms into a disk lookup, the other is waiting for its turn
+ - State 1,3 - one thread is 10 ms into a disk lookup, the other is waiting for its turn
+
 ### i)
-Asdf.
+A given request will take on average `0.8*5 + 0.2*20 = 8` ms. Therefore, the throughput will be approximately `1000/8 = 125` requests per second.
 
-### ii)
-Asdf.
-
-### iii)
-Asdf.
+### ii), iii)
+Instead of doing the annoying discrete math in my head, I wrote a little program ( src/q2sim.rs ) to simulate each of the cases, and outputs the average amount of requests served per second.
+```
+$ bin/q2sim
+case ii result: 175.72
+case iii result: 230.06
+```
 
 ## Question Three
 For eight seconds, reduce the clock speed by half so that every second the value of the clock is increased by half a second. After eight seconds, return to normal clock speed. Numerically, this would look somewhat like this:  

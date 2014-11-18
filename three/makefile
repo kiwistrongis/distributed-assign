@@ -9,21 +9,24 @@ clean:
 ## java vars
 cp = bin
 dest = -d bin
-warnings =
+java_warnings =
+## rust vars
+rust_warnings = -A dead_code -A unused_variable
+rust_opts = $(rust_warnings) -g -L bin
 ## other vars
 package_file = pkg/kalev_100425828_assign3.zip
-pandoc = ~/.cabal/bin/pandoc
+pandoc_cmd = ~/.cabal/bin/pandoc
 
 # includes
 #include deps.mk
-#include lists.mk
+include lists.mk
 
 # compilation definitions
-$(class_files): bin/%.class : src/%.java
-	javac -cp $(cp) $(dest) $(warnings) $<
+$(binaries): bin/% : src/%.rs
+	rustc $(rust_opts) $< -o $@
 
-report.pdf: report.md
-	$(pandoc) -r markdown_github $< -o $@
+$(class_files): bin/%.class : src/%.java
+	javac -cp $(cp) $(dest) $(java_warnings) $<
 
 $(package_file): $(class_files) report.pdf
 	zip -FSr $(package_file) \
@@ -32,18 +35,30 @@ $(package_file): $(class_files) report.pdf
 		report.pdf report.md \
 		pkg/.gitignore
 
+report.pdf: report.md
+	$(pandoc_cmd) -r markdown_github $< -o $@
+
 # commands
 all: build report package
-build: $(class_files)
+build: $(class_files) $(binaries)
 report: report.pdf
 package: $(package_file)
 
-test: test-counter
-run: test-counter
+run: \
+	test-q1-bad
+	test-q1-good
+	test-q2
+test: test-q1-bad
 
 # tests
-test-counter: bin/Counter.class
-	java -cp $(cp) Counter
+test-q1-bad: bin/BadCounting.class
+	java -cp $(cp) BadCounting
+
+test-q1-good: bin/GoodCounting.class
+	java -cp $(cp) GoodCounting
+
+test-q2: bin/q2sim
+	$<
 
 test-report: report.pdf
 	evince $<
