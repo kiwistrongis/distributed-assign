@@ -15,7 +15,6 @@ rust_warnings = -A dead_code -A unused_variable
 rust_opts = $(rust_warnings) -g -L bin
 ## other vars
 package_file = pkg/kalev_100425828_assign3.zip
-pandoc_cmd = ~/.cabal/bin/pandoc
 
 # includes
 include deps.mk
@@ -36,7 +35,7 @@ $(package_file): $(class_files) report.pdf
 		pkg/.gitignore
 
 report.pdf: report.md
-	$(pandoc_cmd) -r markdown_github $< -o $@
+	pandoc -r markdown_github $< -o $@
 
 # commands
 all: build report package
